@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Me",
+    "classifications": [ "Console" ], 
+    "name": "Advent: mitt advent of code-template",
+    "identity": "Advent.FSharp",         
+    "groupIdentity":"Advent",
+    "shortName": "advent",                    // You can create the project using this short name instead of the one above.
+    "tags": {
+      "language": "F#",                         // Specify that this template is in C#.
+      "type":"project"
+    },
+    "sourceName": "Template.Con",              // Will replace the string 'MyProject.StarterWeb' with the value provided via -n.
+    "preferNameDirectory":true
+  }

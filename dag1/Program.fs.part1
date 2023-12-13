@@ -1,0 +1,39 @@
+﻿// For more information see https://aka.ms/fsharp-console-apps
+open System.IO
+
+let extractFirstAndLastDigits (filePath: string) : unit =
+    let isDigit (c: char) : bool = System.Char.IsDigit(c)
+
+    let rec findFirstAndLastDigits (s: string) : int option =
+        match s with
+        | null -> None
+        | _ ->
+            let charArray = s.ToCharArray()
+            match charArray |> Array.tryFind isDigit, charArray |> Array.rev |> Array.tryFind isDigit with
+            | Some firstDigit, Some lastDigit ->
+                let concatenatedDigits = string firstDigit + string lastDigit
+                Some (int concatenatedDigits)
+            | _ -> None
+
+    let mutable totalSum = 0
+
+    try
+        use streamReader = File.OpenText(filePath)
+        while not streamReader.EndOfStream do
+            let line = streamReader.ReadLine()
+
+            match findFirstAndLastDigits line with
+            | Some digits ->
+                //printfn "Line: %s, Concatenated Digits: %d" line digits
+                totalSum <- totalSum + digits
+            | _ -> () // No digits found on the line
+
+        printfn "\nTotal Sum of Numbers for All Lines: %d" totalSum
+    with
+    | :? System.IO.FileNotFoundException as ex ->
+        printfn "Error: %s" ex.Message
+    | :? System.IO.IOException as ex ->
+        printfn "Error: %s" ex.Message
+
+// Example usage
+extractFirstAndLastDigits "input"
