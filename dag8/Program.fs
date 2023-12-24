@@ -1,12 +1,9 @@
 ﻿open System
 open System.IO
-open System.Collections.Generic
-open MathNet.Numerics
 
 let input = File.ReadAllLines("input")
 
 type LR = { L: string; R: string }
-
 
 let commands = input[0].ToCharArray() |> List.ofArray
 
@@ -33,7 +30,6 @@ let rec travel loc cmds stepsAcc =
             travel loc commands stepsAcc // loop commands
         | (cmd::ctail) ->
             travel (doStep cmd loc) ctail ((loc,cmd)::stepsAcc)
-
 
 let path = travel "AAA" commands []
 printfn "Path: %A" (List.rev path)
@@ -71,8 +67,8 @@ let rec findLoop (loc:string) (cmds: char list) stepsAcc (indexes: Map<string,in
 // Find all locations ending with "A"
 let startlocs = lrMap.Keys |> Seq.where (fun s -> s.EndsWith("A"))
 
-// Collect then length from each start location to their end location 
-let mutable lengths: bigint list = []
+// Collect the length from each start location to their end location 
+let mutable lengths: int list = []
 
 for startloc in startlocs do
     // Check if a path entry (location, command, command index) is an end location
@@ -90,17 +86,30 @@ for startloc in startlocs do
     printfn "Endpoints for %s: %A  loop = %d" startloc endlocsWithIndex (fst endlocsWithIndex[1] - fst endlocsWithIndex[0])
 
     // Looking for loops was unnesseccary, the path loops directly after the first end location (all end
-    // locations go to the same next locations as the respective starting location)
+    // locations go to the same next locations as their respective starting location)
     //
-    // Length of the loop is index of the first end location
-    lengths <- (bigint (path |> List.findIndex isEndLoc)) :: lengths
+    // Length of loop = index of the first end location
+    lengths <- (path |> List.findIndex isEndLoc) :: lengths
+
+let inline gcd<'t
+            when 't: (static member (%) : 't * 't -> 't)
+            and 't: equality
+            and 't: (static member Zero : 't)> 
+        a b : 't =
+    let rec gcdimpl = function
+    | (a,b) when b = 't.Zero -> a
+    | (a,b) -> gcdimpl (b, a % b)
+    gcdimpl (a,b)
 
 // Least common multiplier
-let lcm a b = a * b / (bigint.GreatestCommonDivisor (a,b))
-let lcmn nums = Seq.reduce lcm nums
+let inline lcm a b = a * (b / (gcd a b))
+let inline lcmn nums = Seq.reduce lcm nums
 
-//let lengths = [15517; 20777; 19199; 17621; 11309; 16043] |> List.map bigint
+//let lengths = [15517; 20777; 19199; 17621; 11309; 16043] |> List.map int64
 
 printfn "Lengths: %A" lengths
+
+for (a,b) in lengths |> List.pairwise do
+    printfn "Gcd of %A and %A: %A" a b (gcd a b)
 
 printfn "Solution 2: %A" (lcmn lengths)
